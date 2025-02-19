@@ -1,10 +1,11 @@
+
+import 'package:app_gerenciamento_de_tarefas/data/model/model.dart';
+import 'package:app_gerenciamento_de_tarefas/data/repository/tarefa_repository.dart';
+import 'package:app_gerenciamento_de_tarefas/presentation/viewmodel/tarefa_viewmodel.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import '../../data/model/model.dart';
-import '../../data/repository/tarefa_repository.dart';
-import '../viewmodel/tarefa_viewmodel.dart';
-import 'cadastro_page.dart';
-import 'edit_page.dart';
+
+import 'cadastro_page.dart'; // Importe a página de cadastro de livros
+import 'edit_page.dart'; // Importe a página de edição de livros
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -14,49 +15,44 @@ class HomePage extends StatefulWidget {
 }
 
 class HomePageState extends State<HomePage> {
-  List<Tarefa> _tarefas = [];
-  final TarefaViewmodel _viewModel = TarefaViewmodel(TarefaRepository());
+  List<Livro> _livros = [];
+  final LivroViewmodel _viewModel = LivroViewmodel(LivroRepository());
   bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    _loadTarefas();
+    _loadLivros();
   }
 
-  Future<void> _loadTarefas() async {
-    final tarefas = await _viewModel.getTarefas();
+  Future<void> _loadLivros() async {
+    final livros = await _viewModel.getBooks();
     if (mounted) {
       setState(() {
-        _tarefas = tarefas
-          ..removeWhere((t) => t.dataInicio.isEmpty || t.dataFim.isEmpty)
-          ..sort((a, b) {
-            DateTime dataA = DateTime.tryParse(a.dataInicio) ?? DateTime(2100);
-            DateTime dataB = DateTime.tryParse(b.dataInicio) ?? DateTime(2100);
-            return dataA.compareTo(dataB);
-          });
+        _livros = livros
+          ..sort((a, b) => a.titulo.compareTo(b.titulo)); // Ordena por título
         _isLoading = false;
       });
     }
   }
 
-  void _deleteTarefaComUndo(Tarefa tarefa) async {
-    await _viewModel.deleteTarefa(tarefa.id!);
+  void _deleteLivroComUndo(Livro livro) async {
+    await _viewModel.deleteBook(livro.id!);
     if (mounted) {
       setState(() {
-        _tarefas.removeWhere((t) => t.id == tarefa.id);
+        _livros.removeWhere((l) => l.id == livro.id);
       });
     }
 
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Tarefa "${tarefa.nome}" excluída'),
+          content: Text('Livro "${livro.titulo}" excluído'),
           action: SnackBarAction(
             label: 'Desfazer',
             onPressed: () async {
-              await _viewModel.addTarefa(tarefa);
-              _loadTarefas();
+              await _viewModel.createBook(livro);
+              _loadLivros();
             },
           ),
         ),
@@ -68,19 +64,19 @@ class HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Gestão de Tarefas'),
+        title: const Text('Catálogo de Livros'),
         backgroundColor: Colors.teal,
       ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: _isLoading
             ? const Center(child: CircularProgressIndicator())
-            : _tarefas.isEmpty
-                ? const Center(child: Text('Nenhuma tarefa disponível.'))
+            : _livros.isEmpty
+                ? const Center(child: Text('Nenhum livro disponível.'))
                 : ListView.builder(
-                    itemCount: _tarefas.length,
+                    itemCount: _livros.length,
                     itemBuilder: (context, index) {
-                      final tarefa = _tarefas[index];
+                      final livro = _livros[index];
                       return Card(
                         elevation: 5,
                         margin: const EdgeInsets.symmetric(vertical: 8),
@@ -93,7 +89,7 @@ class HomePageState extends State<HomePage> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                tarefa.nome,
+                                livro.titulo,
                                 style: const TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 18,
@@ -101,22 +97,19 @@ class HomePageState extends State<HomePage> {
                                 ),
                               ),
                               const SizedBox(height: 8),
-                              Text('Descrição: ${tarefa.descricao}'),
+                              Text('Autor: ${livro.autor}'),
                               const SizedBox(height: 8),
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: Text(
-                                      'Início: ${DateFormat('dd/MM/yyyy').format(DateTime.tryParse(tarefa.dataInicio) ?? DateTime(2100))}',
-                                    ),
-                                  ),
-                                  Expanded(
-                                    child: Text(
-                                      'Fim: ${DateFormat('dd/MM/yyyy').format(DateTime.tryParse(tarefa.dataFim) ?? DateTime(2100))}',
-                                    ),
-                                  ),
-                                ],
-                              ),
+                              Text('Ano de Publicação: ${livro.anoPublicacao}'),
+                              const SizedBox(height: 8),
+                              Text('Avaliação: ${livro.avaliacao} estrelas'),
+                              const SizedBox(height: 8),
+                              if (livro.urlCapa != null && livro.urlCapa!.isNotEmpty)
+                                Image.network(
+                                  livro.urlCapa!,
+                                  height: 100,
+                                  width: double.infinity,
+                                  fit: BoxFit.cover,
+                                ),
                               const SizedBox(height: 8),
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.end,
@@ -127,18 +120,18 @@ class HomePageState extends State<HomePage> {
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                          builder: (context) => EditTarefaPage(tarefa: tarefa),
+                                          builder: (context) => EditLivroPage(livro: livro),
                                         ),
                                       ).then((wasUpdated) {
                                         if (wasUpdated == true) {
-                                          _loadTarefas();
+                                          _loadLivros();
                                         }
                                       });
                                     },
                                   ),
                                   IconButton(
                                     icon: const Icon(Icons.delete, color: Colors.red),
-                                    onPressed: () => _deleteTarefaComUndo(tarefa),
+                                    onPressed: () => _deleteLivroComUndo(livro),
                                   ),
                                 ],
                               ),
@@ -153,11 +146,11 @@ class HomePageState extends State<HomePage> {
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => const CadastroTarefa()),
-          ).then((_) => _loadTarefas());
+            MaterialPageRoute(builder: (context) => const CadastroLivro()),
+          ).then((_) => _loadLivros());
         },
         backgroundColor: Colors.teal,
-        tooltip: 'Adicionar Tarefa',
+        tooltip: 'Adicionar Livro',
         child: const Icon(Icons.add, size: 30),
       ),
     );
