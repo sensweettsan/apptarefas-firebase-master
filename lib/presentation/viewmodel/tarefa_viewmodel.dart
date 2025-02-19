@@ -1,24 +1,30 @@
-import '../../data/model/model.dart';
-import '../../data/repository/tarefa_repository.dart';
+import 'package:app_gerenciamento_de_tarefas/data/repository/tarefa_repository.dart';
 
-class TarefaViewmodel {
-  final TarefaRepository repository;
+import '../../data/model/model.dart'; // Importe o modelo Livro
+// Importe o repositório
 
-  TarefaViewmodel(this.repository);
+class LivroViewmodel {
+  final LivroRepository repository;
 
-  Future<void> addTarefa(Tarefa tarefa) async {
-    await repository.insertTarefa(tarefa);
+  LivroViewmodel(this.repository);
+
+  // Método para adicionar um livro (CREATE)
+  Future<void> createBook(Livro livro) async {
+    await repository.createBook(livro);
   }
 
-  Future<List<Tarefa>> getTarefas() async {
-    return await repository.getTarefa();
+  // Método para obter todos os livros (READ)
+  Future<List<Livro>> getBooks() async {
+    return await repository.getBooks();
   }
 
-  Future<void> updateTarefa(String id, Tarefa tarefa) async {
-    await repository.updateTarefa(id, tarefa);
+  // Método para atualizar um livro (UPDATE)
+  Future<void> updateBook(String id, Livro livro) async {
+    await repository.updateBook(id, livro);
   }
 
-  Future<void> deleteTarefa(String id) async {
-    await repository.deleteTarefa(id);
+  // Método para deletar um livro (DELETE)
+  Future<void> deleteBook(String id) async {
+    await repository.deleteBook(id);
   }
 }

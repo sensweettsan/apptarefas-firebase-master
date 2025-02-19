@@ -47,31 +47,31 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyDvL9EetEZYZ5Z--94xJZr0B45Vl1hY-To',
-    appId: '1:357443021886:web:016fd5fb6695e77c6af56f',
-    messagingSenderId: '357443021886',
-    projectId: 'apptarefa-91280',
-    authDomain: 'apptarefa-91280.firebaseapp.com',
-    storageBucket: 'apptarefa-91280.firebasestorage.app',
-    measurementId: 'G-XJ12Y3LZQH',
+    apiKey: 'AIzaSyDC-MtrHdkjdrZUg9MG-Zl6OfjiDjJTM3w',
+    appId: '1:297220299582:web:91d1f72b02ee78f19eea6f',
+    messagingSenderId: '297220299582',
+    projectId: 'projeto-livros-80dc9',
+    authDomain: 'projeto-livros-80dc9.firebaseapp.com',
+    storageBucket: 'projeto-livros-80dc9.firebasestorage.app',
+    measurementId: 'G-ZBC4JTY8VX',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyAi7xFGwWxK7SZtU5APLXx5mMiwzEi0fsk',
-    appId: '1:357443021886:android:bd3d20f4f96f67576af56f',
-    messagingSenderId: '357443021886',
-    projectId: 'apptarefa-91280',
-    storageBucket: 'apptarefa-91280.firebasestorage.app',
+    apiKey: 'AIzaSyArEBbaxasr6dJ6EuDevMILycTKog1FOoY',
+    appId: '1:297220299582:android:e22a2ae11bf1941e9eea6f',
+    messagingSenderId: '297220299582',
+    projectId: 'projeto-livros-80dc9',
+    storageBucket: 'projeto-livros-80dc9.firebasestorage.app',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
-    apiKey: 'AIzaSyDvL9EetEZYZ5Z--94xJZr0B45Vl1hY-To',
-    appId: '1:357443021886:web:598c94180331ece96af56f',
-    messagingSenderId: '357443021886',
-    projectId: 'apptarefa-91280',
-    authDomain: 'apptarefa-91280.firebaseapp.com',
-    storageBucket: 'apptarefa-91280.firebasestorage.app',
-    measurementId: 'G-3WCJKDMESB',
+    apiKey: 'AIzaSyDC-MtrHdkjdrZUg9MG-Zl6OfjiDjJTM3w',
+    appId: '1:297220299582:web:bd8d75834c806a309eea6f',
+    messagingSenderId: '297220299582',
+    projectId: 'projeto-livros-80dc9',
+    authDomain: 'projeto-livros-80dc9.firebaseapp.com',
+    storageBucket: 'projeto-livros-80dc9.firebasestorage.app',
+    measurementId: 'G-2PMS28N0W2',
   );
 
 }

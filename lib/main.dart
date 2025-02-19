@@ -4,7 +4,8 @@ import 'package:firebase_core/firebase_core.dart';
 import 'presentation/pages/home_page.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+  WidgetsFlutterBinding
+      .ensureInitialized(); //comando para fazer o filebase funcionar em ANDROID
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );

@@ -1,33 +1,30 @@
-import '../../core/database.dart';
-import '../model/model.dart';
+import '../../core/database.dart'; // Importe o helper do Firestore
+import '../model/model.dart'; // Importe o modelo Livro
 
-class TarefaRepository {
-  final String collection = 'tarefas';
+class LivroRepository {
+  final String collection = 'livros'; // Nome da coleção no Firestore
 
-  Future<void> insertTarefa(Tarefa tarefa) async {
-    await DatabaseHelper.addDocument(collection, tarefa.toMap());
+  // Método para adicionar um novo livro ao Firestore (CREATE)
+  Future<void> createBook(Livro livro) async {
+    await DatabaseHelper.addDocument(collection, livro.toMap());
   }
 
-  Future<List<Tarefa>> getTarefa() async {
-    List<Map<String, dynamic>> tarefaMaps =
+  // Método para obter todos os livros do Firestore (READ)
+  Future<List<Livro>> getBooks() async {
+    List<Map<String, dynamic>> booksMaps =
         await DatabaseHelper.getDocuments(collection);
-    return tarefaMaps.map((map) {
-      return Tarefa(
-        id: map['id'], // O Firestore gera um ID string
-        nome: map['nome'],
-        descricao: map['descricao'] ?? '',
-        status: map['status'],
-        dataInicio: map['dataInicio'] ?? '',
-        dataFim: map['dataFim'] ?? '',
-      );
+    return booksMaps.map((map) {
+      return Livro.fromMap(map, map['id']); // Converte o Map em um objeto Livro
     }).toList();
   }
 
-  Future<void> updateTarefa(String id, Tarefa tarefa) async {
-    await DatabaseHelper.updateDocument(collection, id, tarefa.toMap());
+  // Método para atualizar um livro existente no Firestore (UPDATE)
+  Future<void> updateBook(String id, Livro livro) async {
+    await DatabaseHelper.updateDocument(collection, id, livro.toMap());
   }
 
-  Future<void> deleteTarefa(String id) async {
+  // Método para deletar um livro do Firestore (DELETE)
+  Future<void> deleteBook(String id) async {
     await DatabaseHelper.deleteDocument(collection, id);
   }
 }

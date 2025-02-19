@@ -1,91 +1,54 @@
-import 'package:app_gerenciamento_de_tarefas/data/model/model.dart';
 import 'package:app_gerenciamento_de_tarefas/data/repository/tarefa_repository.dart';
 import 'package:app_gerenciamento_de_tarefas/presentation/viewmodel/tarefa_viewmodel.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'package:app_gerenciamento_de_tarefas/data/model/model.dart';
 
-class CadastroTarefa extends StatefulWidget {
-  const CadastroTarefa({super.key});
+class CadastroLivro extends StatefulWidget {
+  const CadastroLivro({super.key});
 
   @override
-  State<CadastroTarefa> createState() => _CadastroTarefaState();
+  State<CadastroLivro> createState() => _CadastroLivroState();
 }
 
-class _CadastroTarefaState extends State<CadastroTarefa> {
+class _CadastroLivroState extends State<CadastroLivro> {
   final _formKey = GlobalKey<FormState>();
-  final nomeController = TextEditingController();
-  final descricaoController = TextEditingController();
-  final dataInicioController = TextEditingController();
-  final dataFimController = TextEditingController();
-  final TarefaViewmodel _viewModel = TarefaViewmodel(TarefaRepository());
+  final tituloController = TextEditingController();
+  final autorController = TextEditingController();
+  final anoPublicacaoController = TextEditingController();
+  final avaliacaoController = TextEditingController();
+  final urlCapaController = TextEditingController();
+  final LivroViewmodel _viewModel = LivroViewmodel(LivroRepository());
 
-  // Método para salvar a tarefa
-  saveTarefa() async {
+  // Método para salvar o livro
+  Future<void> saveLivro() async {
     try {
       if (_formKey.currentState!.validate()) {
-        final tarefa = Tarefa(
-          nome: nomeController.text,
-          descricao: descricaoController.text,
-          status: 'Pendente',
-          dataInicio: DateFormat('dd/MM/yyyy')
-              .parse(dataInicioController.text)
-              .toIso8601String(),
-          dataFim: DateFormat('dd/MM/yyyy')
-              .parse(dataFimController.text)
-              .toIso8601String(),
+        final livro = Livro(
+          titulo: tituloController.text,
+          autor: autorController.text,
+          anoPublicacao: int.parse(anoPublicacaoController.text),
+          avaliacao: double.parse(avaliacaoController.text),
+          urlCapa: urlCapaController.text,
         );
 
-        await _viewModel.addTarefa(tarefa);
+        await _viewModel.createBook(livro);
 
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Tarefa adicionada com sucesso!')),
+            const SnackBar(content: Text('Livro adicionado com sucesso!')),
           );
           Navigator.pop(context); // Fecha a página após salvar
         }
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              'Erro ao salvar a tarefa: ${e.toString()}',
-              style: const TextStyle(color: Colors.white),
-            ),
-            backgroundColor: Colors.red,
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(
+            'Erro ao salvar o livro: ${e.toString()}',
+            style: const TextStyle(color: Colors.white),
           ),
-        );
+        ));
       }
-    }
-  }
-
-  /// Método para exibir o calendário e formatar a data
-  Future<void> _selectDate(
-      BuildContext context, TextEditingController controller) async {
-    final DateTime? pickedDate = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2100),
-      builder: (BuildContext context, Widget? child) {
-        return Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.light(
-              primary: Colors.teal, // Cor de destaque do calendário
-              onPrimary: Colors.white, // Cor do texto nos botões selecionados
-              onSurface: Colors.black, // Cor do texto
-            ),
-          ),
-          child: child!,
-        );
-      },
-    );
-
-    if (pickedDate != null) {
-      setState(() {
-        controller.text =
-            DateFormat('dd/MM/yyyy').format(pickedDate); // Formatação BR
-      });
     }
   }
 
@@ -93,7 +56,7 @@ class _CadastroTarefaState extends State<CadastroTarefa> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Cadastro de Tarefas'),
+        title: const Text('Cadastro de Livro'),
         backgroundColor: Colors.teal,
       ),
       body: Padding(
@@ -109,7 +72,7 @@ class _CadastroTarefaState extends State<CadastroTarefa> {
                   child: Column(
                     children: [
                       const Text(
-                        'Cadastrar uma Tarefa',
+                        'Cadastrar um Livro',
                         style: TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
@@ -117,11 +80,11 @@ class _CadastroTarefaState extends State<CadastroTarefa> {
                         ),
                       ),
                       const SizedBox(height: 20),
-                      // Campo Nome
+                      // Campo Título
                       TextFormField(
-                        controller: nomeController,
+                        controller: tituloController,
                         decoration: InputDecoration(
-                          labelText: 'Nome',
+                          labelText: 'Título',
                           labelStyle: TextStyle(color: Colors.teal.shade700),
                           border: const OutlineInputBorder(),
                           focusedBorder: OutlineInputBorder(
@@ -130,18 +93,17 @@ class _CadastroTarefaState extends State<CadastroTarefa> {
                         ),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'Por favor entre com um nome';
+                            return 'Por favor, insira o título do livro';
                           }
                           return null;
                         },
                       ),
                       const SizedBox(height: 16),
-                      // Campo Descrição
+                      // Campo Autor
                       TextFormField(
-                        controller: descricaoController,
-                        maxLines: 5,
+                        controller: autorController,
                         decoration: InputDecoration(
-                          labelText: 'Descrição',
+                          labelText: 'Autor',
                           labelStyle: TextStyle(color: Colors.teal.shade700),
                           border: const OutlineInputBorder(),
                           focusedBorder: OutlineInputBorder(
@@ -150,57 +112,75 @@ class _CadastroTarefaState extends State<CadastroTarefa> {
                         ),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'Por favor entre com a descrição';
+                            return 'Por favor, insira o autor do livro';
                           }
                           return null;
                         },
                       ),
                       const SizedBox(height: 16),
-                      // Campo Data de Início
+                      // Campo Ano de Publicação
                       TextFormField(
-                        controller: dataInicioController,
-                        readOnly: true,
+                        controller: anoPublicacaoController,
                         decoration: InputDecoration(
-                          labelText: 'Data de Início',
+                          labelText: 'Ano de Publicação',
                           labelStyle: TextStyle(color: Colors.teal.shade700),
                           border: const OutlineInputBorder(),
                           focusedBorder: OutlineInputBorder(
                             borderSide: BorderSide(color: Colors.teal.shade700),
                           ),
-                          suffixIcon: IconButton(
-                            icon: const Icon(Icons.calendar_today),
-                            onPressed: () =>
-                                _selectDate(context, dataInicioController),
-                          ),
                         ),
+                        keyboardType: TextInputType.number,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'Por favor entre com a data de início';
+                            return 'Por favor, insira o ano de publicação';
+                          }
+                          if (int.tryParse(value) == null) {
+                            return 'Ano de publicação inválido';
                           }
                           return null;
                         },
                       ),
                       const SizedBox(height: 16),
-                      // Campo Data de Fim
+                      // Campo Avaliação (1 a 5)
                       TextFormField(
-                        controller: dataFimController,
-                        readOnly: true,
+                        controller: avaliacaoController,
                         decoration: InputDecoration(
-                          labelText: 'Data de Fim',
+                          labelText: 'Avaliação (1 a 5)',
                           labelStyle: TextStyle(color: Colors.teal.shade700),
                           border: const OutlineInputBorder(),
                           focusedBorder: OutlineInputBorder(
                             borderSide: BorderSide(color: Colors.teal.shade700),
                           ),
-                          suffixIcon: IconButton(
-                            icon: const Icon(Icons.calendar_today),
-                            onPressed: () =>
-                                _selectDate(context, dataFimController),
+                        ),
+                        keyboardType: TextInputType.number,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Por favor, insira a avaliação';
+                          }
+                          final avaliacao = double.tryParse(value);
+                          if (avaliacao == null ||
+                              avaliacao < 1 ||
+                              avaliacao > 5) {
+                            return 'Avaliação deve ser entre 1 e 5';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      // Campo URL da Capa
+                      TextFormField(
+                        controller: urlCapaController,
+                        decoration: InputDecoration(
+                          labelText: 'URL da Capa',
+                          labelStyle: TextStyle(color: Colors.teal.shade700),
+                          border: const OutlineInputBorder(),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: Colors.teal.shade700),
                           ),
                         ),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'Por favor entre com a data de fim';
+                            return 'Por favor, insira a URL da capa';
                           }
                           return null;
                         },
@@ -208,7 +188,7 @@ class _CadastroTarefaState extends State<CadastroTarefa> {
                       const SizedBox(height: 30),
                       // Botão de Salvar
                       ElevatedButton.icon(
-                        onPressed: saveTarefa,
+                        onPressed: saveLivro,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.teal,
                           padding: const EdgeInsets.symmetric(

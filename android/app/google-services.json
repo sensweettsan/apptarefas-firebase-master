@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "357443021886",
-    "project_id": "apptarefa-91280",
-    "storage_bucket": "apptarefa-91280.firebasestorage.app"
+    "project_number": "297220299582",
+    "project_id": "projeto-livros-80dc9",
+    "storage_bucket": "projeto-livros-80dc9.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:357443021886:android:bd3d20f4f96f67576af56f",
+        "mobilesdk_app_id": "1:297220299582:android:e22a2ae11bf1941e9eea6f",
         "android_client_info": {
           "package_name": "com.example.app_gerenciamento_de_tarefas"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyAi7xFGwWxK7SZtU5APLXx5mMiwzEi0fsk"
+          "current_key": "AIzaSyArEBbaxasr6dJ6EuDevMILycTKog1FOoY"
         }
       ],
       "services": {
