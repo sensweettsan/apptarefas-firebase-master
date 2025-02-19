@@ -1,7 +1,9 @@
 import 'package:app_gerenciamento_de_tarefas/data/repository/tarefa_repository.dart';
 import 'package:app_gerenciamento_de_tarefas/presentation/viewmodel/tarefa_viewmodel.dart';
 import 'package:flutter/material.dart';
-import 'package:app_gerenciamento_de_tarefas/data/model/model.dart';
+import 'dart:io';
+import '../../data/model/model.dart';
+
 
 class CadastroLivro extends StatefulWidget {
   const CadastroLivro({super.key});
@@ -16,19 +18,41 @@ class _CadastroLivroState extends State<CadastroLivro> {
   final autorController = TextEditingController();
   final anoPublicacaoController = TextEditingController();
   final avaliacaoController = TextEditingController();
-  final urlCapaController = TextEditingController();
   final LivroViewmodel _viewModel = LivroViewmodel(LivroRepository());
+  final ImagePicker _picker = ImagePicker();
+  XFile? _imagemSelecionada;
 
+  // Método para selecionar uma imagem da galeria
+  Future<void> _selecionarImagem() async {
+    final XFile? imagem = await _picker.pickImage(source: ImageSource.gallery);
+    setState(() {
+      _imagemSelecionada = imagem;
+    });
+  }
+
+  // Método para fazer upload da imagem no Firebase Storage
+  Future<String?> _uploadImagem() async {
+    if (_imagemSelecionada == null) return null;
+
+    final storageRef = FirebaseStorage.instance
+        .ref()
+        .child('capas/${DateTime.now().toString()}');
+    await storageRef.putFile(File(_imagemSelecionada!.path));
+    return await storageRef.getDownloadURL();
+  }
+}
   // Método para salvar o livro
   Future<void> saveLivro() async {
     try {
       if (_formKey.currentState!.validate()) {
+        final urlCapa = await _uploadImagem();
+
         final livro = Livro(
           titulo: tituloController.text,
           autor: autorController.text,
           anoPublicacao: int.parse(anoPublicacaoController.text),
           avaliacao: double.parse(avaliacaoController.text),
-          urlCapa: urlCapaController.text,
+          urlCapa: urlCapa,
         );
 
         await _viewModel.createBook(livro);
@@ -42,10 +66,12 @@ class _CadastroLivroState extends State<CadastroLivro> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text(
-            'Erro ao salvar o livro: ${e.toString()}',
-            style: const TextStyle(color: Colors.white),
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Erro ao salvar o livro: ${e.toString()}',
+              style: const TextStyle(color: Colors.white),
+            backgroundColor: Colors.red,
           ),
         ));
       }
@@ -158,32 +184,24 @@ class _CadastroLivroState extends State<CadastroLivro> {
                             return 'Por favor, insira a avaliação';
                           }
                           final avaliacao = double.tryParse(value);
-                          if (avaliacao == null ||
-                              avaliacao < 1 ||
-                              avaliacao > 5) {
+                          if (avaliacao == null || avaliacao < 1 || avaliacao > 5) {
                             return 'Avaliação deve ser entre 1 e 5';
                           }
                           return null;
                         },
                       ),
                       const SizedBox(height: 16),
-                      // Campo URL da Capa
-                      TextFormField(
-                        controller: urlCapaController,
-                        decoration: InputDecoration(
-                          labelText: 'URL da Capa',
-                          labelStyle: TextStyle(color: Colors.teal.shade700),
-                          border: const OutlineInputBorder(),
-                          focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: Colors.teal.shade700),
-                          ),
+                      // Campo para selecionar imagem da capa
+                      if (_imagemSelecionada != null)
+                        Image.file(
+                          File(_imagemSelecionada!.path),
+                          height: 100,
+                          width: 100,
+                          fit: BoxFit.cover,
                         ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Por favor, insira a URL da capa';
-                          }
-                          return null;
-                        },
+                      ElevatedButton(
+                        onPressed: _selecionarImagem,
+                        child: const Text('Selecionar Imagem da Capa'),
                       ),
                       const SizedBox(height: 30),
                       // Botão de Salvar

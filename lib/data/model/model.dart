@@ -1,10 +1,10 @@
 class Livro {
-  String? id; // ID do documento no Firestore
+  String? id;
   String titulo;
   String autor;
   int anoPublicacao;
-  double avaliacao; // Avaliação de 1 a 5
-  String? urlCapa; // URL da imagem da capa
+  double avaliacao; // Novo campo para avaliação
+  String? urlCapa;
 
   Livro({
     this.id,
@@ -15,7 +15,7 @@ class Livro {
     this.urlCapa,
   });
 
-  // Método para converter o objeto Livro em um Map (útil para salvar no Firestore)
+  // Método para converter o objeto Livro em um Map
   Map<String, dynamic> toMap() {
     return {
       'titulo': titulo,
@@ -26,7 +26,7 @@ class Livro {
     };
   }
 
-  // Método para criar um objeto Livro a partir de um Map (útil para ler do Firestore)
+  // Método para criar um objeto Livro a partir de um Map
   factory Livro.fromMap(Map<String, dynamic> map, String id) {
     return Livro(
       id: id,
