@@ -1,71 +1,65 @@
+import 'package:app_gerenciamento_de_tarefas/data/model/model.dart';
+import 'package:app_gerenciamento_de_tarefas/data/repository/tarefa_repository.dart';
+import 'package:app_gerenciamento_de_tarefas/presentation/viewmodel/tarefa_viewmodel.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import '../../data/model/model.dart';
-import '../../data/repository/tarefa_repository.dart';
-import '../viewmodel/tarefa_viewmodel.dart';
+// Importe o ViewModel
 
-class EditTarefaPage extends StatefulWidget {
-  final Tarefa tarefa;
+class EditLivroPage extends StatefulWidget {
+  final Livro livro;
 
-  const EditTarefaPage({super.key, required this.tarefa});
+  const EditLivroPage({super.key, required this.livro});
 
   @override
-  State<EditTarefaPage> createState() => _EditTarefaPageState();
+  State<EditLivroPage> createState() => _EditLivroPageState();
 }
 
-class _EditTarefaPageState extends State<EditTarefaPage> {
+class _EditLivroPageState extends State<EditLivroPage> {
   final _formKey = GlobalKey<FormState>();
-  late TextEditingController nomeController;
-  late TextEditingController descricaoController;
-  late TextEditingController dataInicioController;
-  late TextEditingController dataFimController;
-  final TarefaViewmodel _viewModel = TarefaViewmodel(TarefaRepository());
-  String? _status;
+  late TextEditingController tituloController;
+  late TextEditingController autorController;
+  late TextEditingController anoPublicacaoController;
+  late TextEditingController avaliacaoController;
+  late TextEditingController urlCapaController;
+  final LivroViewmodel _viewModel = LivroViewmodel(LivroRepository());
 
   @override
   void initState() {
     super.initState();
-    nomeController = TextEditingController(text: widget.tarefa.nome);
-    descricaoController = TextEditingController(text: widget.tarefa.descricao);
-    dataInicioController = TextEditingController(
-        text: DateFormat('dd/MM/yyyy').format(
-            DateTime.tryParse(widget.tarefa.dataInicio) ?? DateTime.now()));
-    dataFimController = TextEditingController(
-        text: DateFormat('dd/MM/yyyy').format(
-            DateTime.tryParse(widget.tarefa.dataFim) ?? DateTime.now()));
-    _status = widget.tarefa.status;
+    tituloController = TextEditingController(text: widget.livro.titulo);
+    autorController = TextEditingController(text: widget.livro.autor);
+    anoPublicacaoController =
+        TextEditingController(text: widget.livro.anoPublicacao.toString());
+    avaliacaoController =
+        TextEditingController(text: widget.livro.avaliacao.toString());
+    urlCapaController = TextEditingController(text: widget.livro.urlCapa);
   }
 
   @override
   void dispose() {
-    nomeController.dispose();
-    descricaoController.dispose();
-    dataInicioController.dispose();
-    dataFimController.dispose();
+    tituloController.dispose();
+    autorController.dispose();
+    anoPublicacaoController.dispose();
+    avaliacaoController.dispose();
+    urlCapaController.dispose();
     super.dispose();
   }
 
   Future<void> saveEdits() async {
     if (_formKey.currentState!.validate()) {
-      final updatedTarefa = Tarefa(
-        id: widget.tarefa.id,
-        nome: nomeController.text,
-        descricao: descricaoController.text,
-        status: _status ?? "Pendente",
-        dataInicio: DateFormat('dd/MM/yyyy')
-            .parse(dataInicioController.text)
-            .toIso8601String(),
-        dataFim: DateFormat('dd/MM/yyyy')
-            .parse(dataFimController.text)
-            .toIso8601String(),
+      final updatedLivro = Livro(
+        id: widget.livro.id,
+        titulo: tituloController.text,
+        autor: autorController.text,
+        anoPublicacao: int.parse(anoPublicacaoController.text),
+        avaliacao: double.parse(avaliacaoController.text),
+        urlCapa: urlCapaController.text,
       );
 
       try {
-        await _viewModel.updateTarefa(
-            widget.tarefa.id.toString(), updatedTarefa);
+        await _viewModel.updateBook(widget.livro.id!, updatedLivro);
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Tarefa atualizada com sucesso!')),
+            const SnackBar(content: Text('Livro atualizado com sucesso!')),
           );
           Navigator.pop(context, true);
         }
@@ -73,7 +67,7 @@ class _EditTarefaPageState extends State<EditTarefaPage> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Erro ao atualizar a tarefa: ${e.toString()}'),
+              content: Text('Erro ao atualizar o livro: ${e.toString()}'),
               backgroundColor: Colors.red,
             ),
           );
@@ -82,27 +76,13 @@ class _EditTarefaPageState extends State<EditTarefaPage> {
     }
   }
 
-  Future<void> _selectDate(
-      BuildContext context, TextEditingController controller) async {
-    final DateTime? pickedDate = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2100),
-    );
-
-    if (pickedDate != null) {
-      setState(() {
-        controller.text = DateFormat('dd/MM/yyyy').format(pickedDate);
-      });
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-          title: const Text('Editar Tarefa'), backgroundColor: Colors.teal),
+        title: const Text('Editar Livro'),
+        backgroundColor: Colors.teal,
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Card(
@@ -113,18 +93,22 @@ class _EditTarefaPageState extends State<EditTarefaPage> {
               key: _formKey,
               child: Column(
                 children: [
-                  _buildTextField(
-                      nomeController, 'Nome', 'Por favor entre com um nome'),
+                  _buildTextField(tituloController, 'Título',
+                      'Por favor, insira o título do livro'),
                   const SizedBox(height: 16),
-                  _buildTextField(descricaoController, 'Descrição',
-                      'Por favor entre com a descrição',
-                      maxLines: 5),
+                  _buildTextField(autorController, 'Autor',
+                      'Por favor, insira o autor do livro'),
                   const SizedBox(height: 16),
-                  _buildDropdown(),
+                  _buildTextField(anoPublicacaoController, 'Ano de Publicação',
+                      'Por favor, insira o ano de publicação',
+                      keyboardType: TextInputType.number),
                   const SizedBox(height: 16),
-                  _buildDateField(dataInicioController, 'Data de Início'),
+                  _buildTextField(avaliacaoController, 'Avaliação (1 a 5)',
+                      'Por favor, insira a avaliação',
+                      keyboardType: TextInputType.number),
                   const SizedBox(height: 16),
-                  _buildDateField(dataFimController, 'Data de Fim'),
+                  _buildTextField(urlCapaController, 'URL da Capa',
+                      'Por favor, insira a URL da capa'),
                   const SizedBox(height: 30),
                   ElevatedButton.icon(
                     onPressed: saveEdits,
@@ -149,49 +133,16 @@ class _EditTarefaPageState extends State<EditTarefaPage> {
 
   Widget _buildTextField(
       TextEditingController controller, String label, String errorMsg,
-      {int maxLines = 1}) {
+      {TextInputType keyboardType = TextInputType.text, int maxLines = 1}) {
     return TextFormField(
       controller: controller,
       maxLines: maxLines,
+      keyboardType: keyboardType,
       decoration: InputDecoration(
         labelText: label,
         border: const OutlineInputBorder(),
       ),
       validator: (value) => value == null || value.isEmpty ? errorMsg : null,
-    );
-  }
-
-  Widget _buildDropdown() {
-    return DropdownButtonFormField<String>(
-      value: _status,
-      decoration: const InputDecoration(
-          labelText: 'Status', border: OutlineInputBorder()),
-      items: const [
-        DropdownMenuItem(value: 'Pendente', child: Text('Pendente')),
-        DropdownMenuItem(value: 'Em andamento', child: Text('Em andamento')),
-        DropdownMenuItem(value: 'Concluído', child: Text('Concluído')),
-      ],
-      onChanged: (value) => setState(() => _status = value),
-      validator: (value) => value == null || value.isEmpty
-          ? 'Por favor selecione um status'
-          : null,
-    );
-  }
-
-  Widget _buildDateField(TextEditingController controller, String label) {
-    return TextFormField(
-      controller: controller,
-      readOnly: true,
-      decoration: InputDecoration(
-        labelText: label,
-        border: const OutlineInputBorder(),
-        suffixIcon: IconButton(
-          icon: const Icon(Icons.calendar_today),
-          onPressed: () => _selectDate(context, controller),
-        ),
-      ),
-      validator: (value) =>
-          value == null || value.isEmpty ? 'Por favor entre com $label' : null,
     );
   }
 }
