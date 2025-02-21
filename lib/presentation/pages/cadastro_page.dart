@@ -1,9 +1,11 @@
 import 'package:app_gerenciamento_de_tarefas/data/repository/tarefa_repository.dart';
 import 'package:app_gerenciamento_de_tarefas/presentation/viewmodel/tarefa_viewmodel.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+
 import 'dart:io';
 import '../../data/model/model.dart';
-
 
 class CadastroLivro extends StatefulWidget {
   const CadastroLivro({super.key});
@@ -22,7 +24,7 @@ class _CadastroLivroState extends State<CadastroLivro> {
   final ImagePicker _picker = ImagePicker();
   XFile? _imagemSelecionada;
 
-  // Método para selecionar uma imagem da galeria
+// Método para selecionar uma imagem da galeria
   Future<void> _selecionarImagem() async {
     final XFile? imagem = await _picker.pickImage(source: ImageSource.gallery);
     setState(() {
@@ -30,7 +32,7 @@ class _CadastroLivroState extends State<CadastroLivro> {
     });
   }
 
-  // Método para fazer upload da imagem no Firebase Storage
+// Método para fazer upload da imagem no Firebase Storage
   Future<String?> _uploadImagem() async {
     if (_imagemSelecionada == null) return null;
 
@@ -40,7 +42,7 @@ class _CadastroLivroState extends State<CadastroLivro> {
     await storageRef.putFile(File(_imagemSelecionada!.path));
     return await storageRef.getDownloadURL();
   }
-}
+
   // Método para salvar o livro
   Future<void> saveLivro() async {
     try {
@@ -71,9 +73,10 @@ class _CadastroLivroState extends State<CadastroLivro> {
             content: Text(
               'Erro ao salvar o livro: ${e.toString()}',
               style: const TextStyle(color: Colors.white),
+            ),
             backgroundColor: Colors.red,
           ),
-        ));
+        );
       }
     }
   }
@@ -184,7 +187,9 @@ class _CadastroLivroState extends State<CadastroLivro> {
                             return 'Por favor, insira a avaliação';
                           }
                           final avaliacao = double.tryParse(value);
-                          if (avaliacao == null || avaliacao < 1 || avaliacao > 5) {
+                          if (avaliacao == null ||
+                              avaliacao < 1 ||
+                              avaliacao > 5) {
                             return 'Avaliação deve ser entre 1 e 5';
                           }
                           return null;
